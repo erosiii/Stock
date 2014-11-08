@@ -103,7 +103,7 @@
             android:layout_weight="1"
             android:divider="#334C4C"
             android:dividerHeight="1dp"
-            android:transcriptMode="alwaysScroll" >
+            android:transcriptMode="normal" >
         </ListView>
     </LinearLayout>
 
