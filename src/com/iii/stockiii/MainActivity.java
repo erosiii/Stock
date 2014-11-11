@@ -49,6 +49,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	 private CheckBox cbRemember;
 	 private ArrayList<Stock> lstStock;
 	 private ArrayList<Voices> lstVoices;
+	 private ArrayList<String> lstSymbolChecked;
 	 private ListStockAdapter adapter;
 	 private Handler handler;
 	 int index;
@@ -94,6 +95,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		
 		lstStock = new ArrayList<Stock>();
 		lstVoices = new ArrayList<Voices>();
+		lstSymbolChecked = new ArrayList<String>();
 		handler = new Handler();
 		 myShare = new MyShareprefer(getApplicationContext(), MyShareprefer.GET_INFOUSER_ITEM); 
 		
@@ -226,7 +228,7 @@ public class MainActivity extends Activity implements OnClickListener{
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
+				
 				return lstStock;
 			}
 
@@ -282,6 +284,23 @@ public class MainActivity extends Activity implements OnClickListener{
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				
+				if( lstSymbolChecked.size() > 0 ) lstSymbolChecked.clear();
+				try {
+					// ---------------get String ------------------------//
+					String UrlGetDataDo = ConfigurationServer.getURLServer() + "wsgetCheckedInterest.php";
+					JSONObject json = new JSONObject();
+					
+					JSONArray jarr = mWs.connectWSPut_Get_Data(UrlGetDataDo, json,
+							"product");
+					for (int i = 0; i < jarr.length(); i++) {
+						JSONObject element = jarr.getJSONObject(i);
+						String symbol = element.getString("symbol");
+						lstSymbolChecked.add(symbol);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
 				return lstVoices;
 			}
@@ -315,7 +334,7 @@ public class MainActivity extends Activity implements OnClickListener{
 							setVoice(voices);
 						}else if(lsNow.equals("13:00")){
 							setVoice(voices);
-						}else if(lsNow.equals("17:20")){
+						}else if(lsNow.equals("17:07")){
 							setVoice(voices);
 						}else if(lsNow.equals("10:56")){
 							setVoice(voices);
@@ -325,23 +344,25 @@ public class MainActivity extends Activity implements OnClickListener{
 					e.printStackTrace();
 				}
 			}
-			
-			
 	}
 	
 	private void setVoice(Voices voices){
 		if(voices.getInc_des() == 0){
-			VoiceMangamentHelp.callVibrate(MainActivity.this, time);
-			VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, voices.getStrchange(),"giam", Integer.parseInt(left_value),
-			 Integer.parseInt(right_value), Integer.parseInt(left_price), Integer.parseInt(right_price),
-			"cham", "gia");
-			new WSUpdateFlag(MainActivity.this, voices.getStrchange()).execute();
+				if(lstSymbolChecked.contains(voices.getStrchange())){
+					VoiceMangamentHelp.callVibrate(MainActivity.this, time);
+					VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, voices.getStrchange(),"giam", Integer.parseInt(left_value),
+					 Integer.parseInt(right_value), Integer.parseInt(left_price), Integer.parseInt(right_price),
+					"cham", "gia");
+					new WSUpdateFlag(MainActivity.this, voices.getStrchange()).execute();
+				}
 		}else{
-			VoiceMangamentHelp.callVibrate(MainActivity.this, time);
-			VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, voices.getStrchange(), "tang", Integer.parseInt(left_value),
-			 Integer.parseInt(right_value), Integer.parseInt(left_price), Integer.parseInt(right_price),
-			"cham", "gia");
-			new WSUpdateFlag(MainActivity.this, voices.getStrchange()).execute();
+				if(lstSymbolChecked.contains(voices.getStrchange())){
+					VoiceMangamentHelp.callVibrate(MainActivity.this, time);
+					VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, voices.getStrchange(), "tang", Integer.parseInt(left_value),
+					 Integer.parseInt(right_value), Integer.parseInt(left_price), Integer.parseInt(right_price),
+					"cham", "gia");
+					new WSUpdateFlag(MainActivity.this, voices.getStrchange()).execute();
+				}
 		}
 	}
 	
@@ -401,21 +422,33 @@ public class MainActivity extends Activity implements OnClickListener{
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.btnStartService:
-			if(!thread.isAlive()){
-				thread.start();
+			try {
+				if((thread.getState() == Thread.State.NEW)){
+					thread.start();
 			}
-			if(thread2.isAlive()){
-				thread2.start();
+			} catch (Exception e) {
+				// TODO: handle exception
 			}
+			
+			try {
+				if((thread2.getState() == Thread.State.NEW)){
+					thread2.start();
+			}
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			
 			Toast.makeText(MainActivity.this, "Starting services to get the data", Toast.LENGTH_LONG).show();
 			break;
 			
 		case R.id.btnStopService:
-			if(!thread.isAlive()){
+			try {
 				thread.interrupt();
-			}
-			if(thread2.isAlive()){
+				thread = null;
 				thread2.interrupt();
+				thread2 = null;
+			} catch (Exception e) {
+				// TODO: handle exception
 			}
 			Toast.makeText(MainActivity.this, "Stoped services to get the data", Toast.LENGTH_LONG).show();
 			break;

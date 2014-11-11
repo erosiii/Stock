@@ -40,7 +40,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:textColor="#FFF"
-            android:text="Configuration"/>
+            android:text="Config Voice"/>
     </LinearLayout>
 
     <LinearLayout
