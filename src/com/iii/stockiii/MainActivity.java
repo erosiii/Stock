@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,7 +44,7 @@ import com.iii.stockiii.ws.WSCheckLogin;
 public class MainActivity extends Activity implements OnClickListener{
 	 private ListView lsvStock;
 	 private Button btnStartService, btnStopService;
-	 private Button btnOk, btnCancel;
+	 private Button btnOk, btnCancel, btnConfiguration;
 	 private EditText txtName, txtPhone, txtEmail;
 	 private CheckBox cbRemember;
 	 private ArrayList<Stock> lstStock;
@@ -89,6 +90,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		lsvStock = (ListView)findViewById(R.id.lsvStock);
 		btnStartService = (Button) findViewById(R.id.btnStartService);
 		btnStopService =  (Button) findViewById(R.id.btnStopService);
+		btnConfiguration = (Button) findViewById(R.id.btnConfig);
 		
 		lstStock = new ArrayList<Stock>();
 		lstVoices = new ArrayList<Voices>();
@@ -97,6 +99,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		
 		btnStartService.setOnClickListener(this);
 		btnStopService.setOnClickListener(this);
+		btnConfiguration.setOnClickListener(this);
 		
 	}
 	
@@ -415,6 +418,10 @@ public class MainActivity extends Activity implements OnClickListener{
 				thread2.interrupt();
 			}
 			Toast.makeText(MainActivity.this, "Stoped services to get the data", Toast.LENGTH_LONG).show();
+			break;
+			
+		case R.id.btnConfig:
+			startActivity(new Intent(MainActivity.this, ConfigurationActivity.class));
 			break;
 
 		default:

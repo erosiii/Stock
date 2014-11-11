@@ -34,6 +34,13 @@
             android:layout_weight="1"
             android:textColor="#FFF"
             android:text="Stop"/>
+         <Button 
+            android:id="@+id/btnConfig"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textColor="#FFF"
+            android:text="Configuration"/>
     </LinearLayout>
 
     <LinearLayout
