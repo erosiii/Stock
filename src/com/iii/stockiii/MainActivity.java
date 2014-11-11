@@ -37,7 +37,7 @@ public class MainActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_main);
 		Intent intent = new Intent(MainActivity.this,
 				ConfigurationActivity.class);
-		// Intent intent = new Intent(MainActivity.this, abc.class);
+		// Intent intent = new Intent(MainActivity.this, abc.class);;
 		startActivity(intent);
 		// showDialog(1);
 		// setUI();
