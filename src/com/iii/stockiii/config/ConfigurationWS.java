@@ -1,4 +1,4 @@
-package com.iii.stockiii.config; 
+package com.iii.stockiii.config;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -16,9 +16,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import android.content.Context;
-import android.util.Log;
 
 public class ConfigurationWS {
 
@@ -29,28 +27,32 @@ public class ConfigurationWS {
 		this.context = context;
 	}
 
-	public JSONArray connectWSPut_Get_Data(String url, JSONObject json, String jsonName) {
+	public JSONArray connectWSPut_Get_Data(String url, JSONObject json,
+			String jsonName) {
 		JSONArray jarr = null;
 		try {
 
 			HttpParams httpParams = new BasicHttpParams();
-			HttpConnectionParams.setConnectionTimeout(httpParams, TIMEOUT_MILLISEC);
+			HttpConnectionParams.setConnectionTimeout(httpParams,
+					TIMEOUT_MILLISEC);
 			HttpConnectionParams.setSoTimeout(httpParams, TIMEOUT_MILLISEC);
 			HttpClient client = new DefaultHttpClient(httpParams);
 			HttpPost request = new HttpPost(url);
 			// cach khac de thay vao entity __________________________________
 			StringEntity se = new StringEntity(json.toString(), "UTF-8");
-			InputStreamEntity ise = new InputStreamEntity(new ByteArrayInputStream(json.toString().getBytes(
-					"UTF-8")), -1);
-			//---------------------------------------------------------------------
+			InputStreamEntity ise = new InputStreamEntity(
+					new ByteArrayInputStream(json.toString().getBytes("UTF-8")),
+					-1);
+			// ---------------------------------------------------------------------
 			request.setEntity(se);
-		 	request.setHeader("json", json.toString());
+			request.setHeader("json", json.toString());
 			HttpResponse response = client.execute(request);
 			HttpEntity entity = response.getEntity();
 
 			InputStream instream = entity.getContent();
 
-			String result = ConfigurationWSRestClient.convertStreamToString(instream);
+			String result = ConfigurationWSRestClient
+					.convertStreamToString(instream);
 			JSONObject jobj = new JSONObject(result);
 			jarr = jobj.getJSONArray(jsonName);
 
@@ -84,7 +86,7 @@ public class ConfigurationWS {
 		}
 		return jarr;
 	}
-	
+
 	/**
 	 * 
 	 * @param url
@@ -92,23 +94,26 @@ public class ConfigurationWS {
 	 * @param jsonName
 	 * @return
 	 * 
-	 * lay du lieu kieu jsonObject ve
+	 *         lay du lieu kieu jsonObject ve
 	 */
-	public String getDataJson(String url, JSONObject json, String jsonName){
+	public String getDataJson(String url, JSONObject json, String jsonName) {
 		String result = null;
 		try {
 			HttpParams httpParams = new BasicHttpParams();
-			HttpConnectionParams.setConnectionTimeout(httpParams, TIMEOUT_MILLISEC);
+			HttpConnectionParams.setConnectionTimeout(httpParams,
+					TIMEOUT_MILLISEC);
 			HttpConnectionParams.setSoTimeout(httpParams, TIMEOUT_MILLISEC);
 			HttpClient client = new DefaultHttpClient(httpParams);
 			HttpPost request = new HttpPost(url);
 			// cach khac de thay vao entity __________________________________
 			StringEntity se = new StringEntity(json.toString(), "UTF-8");
-			InputStreamEntity ise = new InputStreamEntity(new ByteArrayInputStream(json.toString().getBytes("UTF-8")), -1);
-			//---------------------------------------------------------------------
+			InputStreamEntity ise = new InputStreamEntity(
+					new ByteArrayInputStream(json.toString().getBytes("UTF-8")),
+					-1);
+			// ---------------------------------------------------------------------
 			request.setEntity(se);
-			//Log.d("fuck", "fuck");
-		 	request.setHeader("json", json.toString());
+			// Log.d("fuck", "fuck");
+			request.setHeader("json", json.toString());
 			HttpResponse response = client.execute(request);
 			HttpEntity entity = response.getEntity();
 			InputStream instream = entity.getContent();
@@ -121,11 +126,13 @@ public class ConfigurationWS {
 	public void connectWS_Put_Data(String url, JSONObject json) {
 		try {
 			HttpParams httpParams = new BasicHttpParams();
-			HttpConnectionParams.setConnectionTimeout(httpParams, TIMEOUT_MILLISEC);
+			HttpConnectionParams.setConnectionTimeout(httpParams,
+					TIMEOUT_MILLISEC);
 			HttpConnectionParams.setSoTimeout(httpParams, TIMEOUT_MILLISEC);
 			HttpClient client = new DefaultHttpClient(httpParams);
 			HttpPost request = new HttpPost(url);
-			request.setEntity(new ByteArrayEntity(json.toString().getBytes("UTF8")));
+			request.setEntity(new ByteArrayEntity(json.toString().getBytes(
+					"UTF8")));
 			request.setHeader("json", json.toString());
 			client.execute(request);
 		} catch (Exception t) {

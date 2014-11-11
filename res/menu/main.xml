@@ -4,9 +4,9 @@
     tools:context="com.iii.stockiii.MainActivity" >
 
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never"/>
+        android:id="@+id/action_ok"
+        android:icon="@drawable/ok"
+        android:orderInCategory="100"        
+        app:showAsAction="always"/>
 
 </menu>
