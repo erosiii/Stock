@@ -67,26 +67,23 @@
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
-        android:layout_below="@+id/rdSaveUser"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="10dip">
+        android:layout_alignParentLeft="true" >
 
         <Button
             android:id="@+id/btnLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:text="Login" >
-        </Button>
+            android:text="Login" />
 
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:text="Cancel" >
-        </Button>
+            android:text="Cancel" />
     </LinearLayout>
 
 </RelativeLayout>

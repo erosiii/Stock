@@ -15,13 +15,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
+import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -29,9 +33,11 @@ import android.widget.Toast;
 import com.iii.stockiii.adapter.ListStockAdapter;
 import com.iii.stockiii.config.ConfigurationServer;
 import com.iii.stockiii.config.ConfigurationWS;
+import com.iii.stockiii.helper.MyShareprefer;
 import com.iii.stockiii.helper.VoiceMangamentHelp;
 import com.iii.stockiii.model.Stock;
 import com.iii.stockiii.model.Voices;
+import com.iii.stockiii.ws.WSCheckLogin;
 
 
 public class MainActivity extends Activity implements OnClickListener{
@@ -39,6 +45,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	 private Button btnStartService, btnStopService;
 	 private Button btnOk, btnCancel;
 	 private EditText txtName, txtPhone, txtEmail;
+	 private CheckBox cbRemember;
 	 private ArrayList<Stock> lstStock;
 	 private ArrayList<Voices> lstVoices;
 	 private ListStockAdapter adapter;
@@ -53,15 +60,27 @@ public class MainActivity extends Activity implements OnClickListener{
 	 private String right_price;
 	 private DecimalFormat df1 = new DecimalFormat("##.#");
 	 private Thread thread, thread2;
+	 private MyShareprefer myShare;
+	 private Dialog dl;
+	 private boolean check;
+	 private int showFrom =0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         policy();
-        showDialogLogin();
         setUI();
         setData();
+        if(TextUtils.isEmpty(myShare.getUerPhone().toString().trim()) && TextUtils.isEmpty(myShare.getUserName().toString().trim())){
+        	showFrom = 0;
+        	if(showFrom==0){
+        		showDialogLogin();
+        	}
+        }else{
+//        	new WSCheckLogin(MainActivity.this, myShare.getUerPhone().toString().trim(), myShare.getUserEmail().toString().trim(),
+//        			check, dl, myShare, showFrom).execute();
+        }
        // VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, "giam", 3, "cham", "gia");
       
     }
@@ -74,6 +93,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		lstStock = new ArrayList<Stock>();
 		lstVoices = new ArrayList<Voices>();
 		handler = new Handler();
+		 myShare = new MyShareprefer(getApplicationContext(), MyShareprefer.GET_INFOUSER_ITEM); 
 		
 		btnStartService.setOnClickListener(this);
 		btnStopService.setOnClickListener(this);
@@ -388,8 +408,12 @@ public class MainActivity extends Activity implements OnClickListener{
 			break;
 			
 		case R.id.btnStopService:
-			thread.interrupt();
-			thread2.interrupt();
+			if(!thread.isAlive()){
+				thread.interrupt();
+			}
+			if(thread2.isAlive()){
+				thread2.interrupt();
+			}
 			Toast.makeText(MainActivity.this, "Stoped services to get the data", Toast.LENGTH_LONG).show();
 			break;
 
@@ -401,7 +425,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	
 	public void showDialogLogin() {
 		// khởi tạo dialog
-		final Dialog dl = new Dialog(this);
+		dl = new Dialog(this);
 		// set loại giao diện hay còn gọi là theme: cái này là ko có title
 		// dl.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dl.setTitle("Viet Stock Tracking");
@@ -418,13 +442,25 @@ public class MainActivity extends Activity implements OnClickListener{
 		txtName = (EditText) dl.findViewById(R.id.txtName);
 		txtPhone = (EditText) dl.findViewById(R.id.txtPhone);
 		txtEmail = (EditText) dl.findViewById(R.id.txtEmail);
-
+		cbRemember = (CheckBox) dl.findViewById(R.id.cbSaveUser);
+		
+		final String phone = myShare.getUerPhone();
+		final String email = myShare.getUserEmail();
+		final String name = myShare.getUserName();
+		
+		if( !TextUtils.isEmpty(phone) && !TextUtils.isEmpty(email) ){
+			txtName.setText(name);
+			txtPhone.setText(phone);
+			txtEmail.setText(email);
+			cbRemember.setChecked(true);
+		}
+		
 		btnOk.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-
-		
+			check = false;
+			new WSCheckLogin(MainActivity.this, txtPhone.getText().toString().trim(), 
+					txtEmail.getText().toString().trim(), check, dl, myShare, showFrom).execute();
 			}
 		});
 
@@ -434,6 +470,21 @@ public class MainActivity extends Activity implements OnClickListener{
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				dl.dismiss();
+				MainActivity.this.finish();
+			}
+		});
+		
+		/** Xử lý sự kiện click vào checkbox lưu lại thông tin user đăng nhập */
+		cbRemember.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if( isChecked ){
+					myShare.setUserEmail( txtEmail.getText().toString().trim() );
+					myShare.setUserName( txtName.getText().toString().trim() );
+					myShare.setUserPhone( txtPhone.getText().toString().trim() );
+				}else{
+					myShare.logout();
+				}
 			}
 		});
 		dl.show();
