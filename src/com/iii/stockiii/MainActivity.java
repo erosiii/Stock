@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -17,9 +18,13 @@ import android.os.StrictMode;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.iii.stockiii.adapter.ListStockAdapter;
 import com.iii.stockiii.config.ConfigurationServer;
@@ -29,13 +34,16 @@ import com.iii.stockiii.model.Stock;
 import com.iii.stockiii.model.Voices;
 
 
-public class MainActivity extends Activity {
-	private ListView lsvStock;
-	private ArrayList<Stock> lstStock;
-	private ArrayList<Voices> lstVoices;
-	private ListStockAdapter adapter;
-	private Handler handler;
-	int index;
+public class MainActivity extends Activity implements OnClickListener{
+	 private ListView lsvStock;
+	 private Button btnStartService, btnStopService;
+	 private Button btnOk, btnCancel;
+	 private EditText txtName, txtPhone, txtEmail;
+	 private ArrayList<Stock> lstStock;
+	 private ArrayList<Voices> lstVoices;
+	 private ListStockAdapter adapter;
+	 private Handler handler;
+	 int index;
 	 int top;
 	 private MediaPlayer media;
 	 private long time;
@@ -44,12 +52,14 @@ public class MainActivity extends Activity {
 	 private String left_price;
 	 private String right_price;
 	 private DecimalFormat df1 = new DecimalFormat("##.#");
+	 private Thread thread, thread2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         policy();
+        showDialogLogin();
         setUI();
         setData();
        // VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, "giam", 3, "cham", "gia");
@@ -58,10 +68,15 @@ public class MainActivity extends Activity {
 
 	private void setUI() {
 		lsvStock = (ListView)findViewById(R.id.lsvStock);
+		btnStartService = (Button) findViewById(R.id.btnStartService);
+		btnStopService =  (Button) findViewById(R.id.btnStopService);
 		
 		lstStock = new ArrayList<Stock>();
 		lstVoices = new ArrayList<Voices>();
 		handler = new Handler();
+		
+		btnStartService.setOnClickListener(this);
+		btnStopService.setOnClickListener(this);
 		
 	}
 	
@@ -103,7 +118,7 @@ public class MainActivity extends Activity {
 			}
 			
 		};
-		Thread thread = new Thread()
+		thread = new Thread()
 		{
 		    @Override
 		    public void run() {
@@ -118,9 +133,9 @@ public class MainActivity extends Activity {
 		    }
 		};
 
-		thread.start();
+		//thread.start();
 		
-		Thread thread2 = new Thread()
+		thread2 = new Thread()
 		{
 		    @Override
 		    public void run() {
@@ -135,7 +150,7 @@ public class MainActivity extends Activity {
 		    }
 		};
 
-		thread2.start();
+		//thread2.start();
 		
 		
 	}
@@ -293,11 +308,13 @@ public class MainActivity extends Activity {
 	
 	private void setVoice(Voices voices){
 		if(voices.getInc_des() == 0){
+			VoiceMangamentHelp.callVibrate(MainActivity.this, time);
 			VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, voices.getStrchange(),"giam", Integer.parseInt(left_value),
 			 Integer.parseInt(right_value), Integer.parseInt(left_price), Integer.parseInt(right_price),
 			"cham", "gia");
 			new WSUpdateFlag(MainActivity.this, voices.getStrchange()).execute();
 		}else{
+			VoiceMangamentHelp.callVibrate(MainActivity.this, time);
 			VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, voices.getStrchange(), "tang", Integer.parseInt(left_value),
 			 Integer.parseInt(right_value), Integer.parseInt(left_price), Integer.parseInt(right_price),
 			"cham", "gia");
@@ -355,6 +372,71 @@ public class MainActivity extends Activity {
 		lsvStock.setAdapter(adapter);
 		adapter.notifyDataSetChanged();
 		lsvStock.setSelectionFromTop(index, top);
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.btnStartService:
+			if(!thread.isAlive()){
+				thread.start();
+			}
+			if(thread2.isAlive()){
+				thread2.start();
+			}
+			Toast.makeText(MainActivity.this, "Starting services to get the data", Toast.LENGTH_LONG).show();
+			break;
+			
+		case R.id.btnStopService:
+			thread.interrupt();
+			thread2.interrupt();
+			Toast.makeText(MainActivity.this, "Stoped services to get the data", Toast.LENGTH_LONG).show();
+			break;
+
+		default:
+			break;
+		}
+		
+	}
+	
+	public void showDialogLogin() {
+		// khởi tạo dialog
+		final Dialog dl = new Dialog(this);
+		// set loại giao diện hay còn gọi là theme: cái này là ko có title
+		// dl.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dl.setTitle("Viet Stock Tracking");
+		// set layout
+		dl.setContentView(R.layout.login_dialog);
+
+		// muốn gọi 1 view trong dialog phải gọi qua dl, ví dụ:
+
+		// rồi làm gì nó thì làm
+		// cuối cùng là show dialog
+
+		btnOk = (Button) dl.findViewById(R.id.btnLogin);
+		btnCancel = (Button) dl.findViewById(R.id.btnCancel);
+		txtName = (EditText) dl.findViewById(R.id.txtName);
+		txtPhone = (EditText) dl.findViewById(R.id.txtPhone);
+		txtEmail = (EditText) dl.findViewById(R.id.txtEmail);
+
+		btnOk.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+
+		
+			}
+		});
+
+		btnCancel.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				dl.dismiss();
+			}
+		});
+		dl.show();
 	}
 
 }

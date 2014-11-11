@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.widget.Toast;
 
 public class VoiceMangamentHelp {
@@ -163,6 +164,16 @@ public class VoiceMangamentHelp {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+			}
+		}
+		
+		public static void callVibrate(Context mContext, long time) {
+			try {
+				time = 1000;
+				Vibrator vibrate = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+				vibrate.vibrate(time);
+				Thread.sleep(time);
+			} catch (Exception e) {
 			}
 		}
 	
