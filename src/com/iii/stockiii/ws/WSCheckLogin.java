@@ -60,7 +60,7 @@ public class WSCheckLogin extends AsyncTask<Void, Void, Boolean>{
 				boolean check = false;
 				try {
 					// ---------------get String ------------------------//
-					String UrlGetDataDo = ConfigurationServer.getURLServer() + "wsGetUser.php";
+					String UrlGetDataDo = ConfigurationServer.getURLServer() + "wscheckuser.php";
 					JSONObject json = new JSONObject();
 					json.put("phone", this.phone);
 					json.put("email", this.email);

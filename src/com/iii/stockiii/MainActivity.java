@@ -443,10 +443,15 @@ public class MainActivity extends Activity implements OnClickListener{
 			
 		case R.id.btnStopService:
 			try {
-				thread.interrupt();
-				thread = null;
-				thread2.interrupt();
-				thread2 = null;
+				if((thread.getState() == Thread.State.NEW)){
+					thread.interrupt();
+					thread = null;
+				}
+				if((thread2.getState() == Thread.State.NEW)){
+					thread2.interrupt();
+					thread2 = null;
+				}
+				
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
@@ -528,6 +533,7 @@ public class MainActivity extends Activity implements OnClickListener{
 			}
 		});
 		dl.show();
+		dl.setCancelable(false);
 	}
 
 }

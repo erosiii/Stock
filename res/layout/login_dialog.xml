@@ -1,75 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-     >
+    android:orientation="vertical" >
 
-    <ImageView
-        android:id="@+id/imgUser"
-        android:layout_width="50dip"
-        android:layout_height="50dip"
-        android:src="@drawable/user" />
-
-    <EditText
-        android:id="@+id/txtName"
-        android:layout_width="fill_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dip"
-        android:layout_toRightOf="@+id/imgUser"
-        android:hint="Enter Your Name" />
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal" >
 
-    <ImageView
-        android:id="@+id/imgPhone"
-        android:layout_width="50dip"
-        android:layout_height="50dip"
-        android:layout_below="@+id/imgUser"
-        android:src="@drawable/phonenumber" />
+        <ImageView
+            android:id="@+id/imgUser"
+            android:layout_width="30dip"
+            android:layout_height="30dip"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/user" />
 
-    <EditText
-        android:id="@+id/txtPhone"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtName"
-        android:layout_marginLeft="5dip"
-        android:layout_marginTop="10dip"
-        android:layout_toRightOf="@+id/imgPhone"
-        android:hint="Enter Your Phone Number" />
-
-    <ImageView
-        android:id="@+id/imgEmail"
-        android:layout_width="50dip"
-        android:layout_height="50dip"
-        android:layout_below="@+id/imgPhone"
-        android:src="@drawable/email" />
-
-    <EditText
-        android:id="@+id/txtEmail"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtPhone"
-        android:layout_marginLeft="5dip"
-        android:layout_marginTop="10dip"
-        android:layout_toRightOf="@+id/imgEmail"
-        android:hint="Enter Your Email" 
-        android:textStyle="italic"
-        android:textColor="#0000FF"/>
-    
-    <CheckBox 
-            android:id="@+id/cbSaveUser"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/txtName"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Remember Me"
-            android:checked="false"
-            android:layout_below="@+id/imgEmail"
-            android:layout_marginLeft="30dip"
-            />
+            android:layout_marginLeft="5dip"
+            android:hint="Enter Your Name" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/imgPhone"
+            android:layout_width="30dip"
+            android:layout_height="30dip"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/phonenumber" />
+
+        <EditText
+            android:id="@+id/txtPhone"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dip"
+            android:hint="Enter Your Phone Number"
+            android:inputType="phone" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/imgEmail"
+            android:layout_width="30dip"
+            android:layout_height="30dip"
+            android:layout_below="@+id/imgPhone"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/email" />
+
+        <EditText
+            android:id="@+id/txtEmail"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dip"
+            android:hint="Enter Your Email"
+            android:inputType="textEmailAddress"
+            android:textColor="#FFF"
+            android:textStyle="italic" />
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/cbSaveUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtEmail"
+        android:layout_marginLeft="30dp"
+        android:layout_toRightOf="@+id/imgEmail"
+        android:checked="false"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:text="Remember Me" />
 
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true" >
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="5dp" >
 
         <Button
             android:id="@+id/btnLogin"
@@ -86,4 +114,4 @@
             android:text="Cancel" />
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

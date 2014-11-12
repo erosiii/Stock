@@ -3,10 +3,5 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.iii.stockiii.MainActivity" >
 
-    <item
-        android:id="@+id/action_ok"
-        android:icon="@drawable/ok"
-        android:orderInCategory="20"        
-        app:showAsAction="ifRoom"/>
 
 </menu>
