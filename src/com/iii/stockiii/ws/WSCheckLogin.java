@@ -20,39 +20,31 @@ import com.iii.stockiii.config.ConfigurationServer;
 import com.iii.stockiii.config.ConfigurationWS;
 import com.iii.stockiii.helper.MyShareprefer;
 
-public class WSCheckLogin extends AsyncTask<Void, Void, Boolean>{
+public class WSCheckLogin extends AsyncTask<Void, Void, Boolean> {
 
 	// ------------------default floor1-----------------------------//
-			private ConfigurationWS mWs;
-			private ProgressDialog mProgress;
-			private Context context;
-			private String phone, email;
-			private boolean checkAcc = false;
-			private Dialog dl;
-			private MyShareprefer myShare;
-			private int showForm;
-			
-			public WSCheckLogin(Context mContext, String phone, String email, boolean checkAcc, Dialog dl,
-					MyShareprefer myShare, int showForm ) {
-				super();
-				context = mContext;
-				mWs = new ConfigurationWS(mContext);
-				mProgress = new ProgressDialog(mContext);
-				this.phone = phone;
-				this.email = email;
-				this.checkAcc = checkAcc;
-				this.dl = dl;
-				this.myShare = myShare;
-				this.showForm =showForm;
-			}
+	private ConfigurationWS mWs;
+	private ProgressDialog mProgress;
+	private Context context;
+	private String phone, email;
+	private boolean checkAcc = false;
+	private Dialog dl;
+	private MyShareprefer myShare;
+	private int showForm;
 
-			@Override
-			protected void onPreExecute() {
-				super.onPreExecute();
-				mProgress.setMessage( context.getResources().getString(R.string.loading) );
-				mProgress.setCancelable(false);
-				mProgress.show();
-			}
+	public WSCheckLogin(Context mContext, String phone, String email,
+			boolean checkAcc, Dialog dl, MyShareprefer myShare, int showForm) {
+		super();
+		context = mContext;
+		mWs = new ConfigurationWS(mContext);
+		mProgress = new ProgressDialog(mContext);
+		this.phone = phone;
+		this.email = email;
+		this.checkAcc = checkAcc;
+		this.dl = dl;
+		this.myShare = myShare;
+		this.showForm = showForm;
+	}
 
 			@Override
 			protected Boolean doInBackground(Void... params) {
@@ -83,20 +75,20 @@ public class WSCheckLogin extends AsyncTask<Void, Void, Boolean>{
 				return checkAcc;
 			}
 
-			@Override
-			protected void onPostExecute( Boolean result) {
-				if( mProgress.isShowing() )
-					mProgress.dismiss();
-				checkAcc = result;
-				if(!checkAcc){
-					showForm = 0;
-					Log.d("AAA", "This account not exist!");
-					Toast.makeText(context, "This account not exist!", 1).show();
-				}else{
-					dl.dismiss();
-				}
-				
-								
-			}
+
+	@Override
+	protected void onPostExecute(Boolean result) {
+		if (mProgress.isShowing())
+			mProgress.dismiss();
+		checkAcc = result;
+		if (!checkAcc) {
+			showForm = 0;
+			Log.d("AAA", "This account not exist!");
+			Toast.makeText(context, "This account not exist!", 1).show();
+		} else {
+			dl.dismiss();
+		}
+
+	}
 
 }

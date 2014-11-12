@@ -336,7 +336,7 @@ public class MainActivity extends Activity implements OnClickListener{
 							setVoice(voices);
 						}else if(lsNow.equals("17:07")){
 							setVoice(voices);
-						}else if(lsNow.equals("10:56")){
+						}else if(lsNow.equals("10:20")){
 							setVoice(voices);
 						}
 					}

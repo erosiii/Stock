@@ -3,6 +3,7 @@ package com.iii.stockiii;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -15,11 +16,16 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,20 +35,27 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
+import android.widget.Toast;
+
 import com.iii.stockiii.adapter.ListSymbolAdapter;
 import com.iii.stockiii.config.ConfigurationServer;
 import com.iii.stockiii.config.ConfigurationWS;
 import com.iii.stockiii.model.Symbol;
 
-public class ConfigurationActivity extends ActionBarActivity implements
-		OnItemClickListener, OnClickListener {
+public class ConfigurationActivity extends Activity implements
+		OnItemClickListener, OnClickListener, OnQueryTextListener {
 
 	private ListView lvconfig;
 	private ProgressDialog mProgress;
 	private ArrayAdapter<Symbol> adapter;
 	private List<Symbol> listsymbol;
 	private Button btnOK, btnCancel;
+	private SearchView mSearchView;
+	private List<String> listcode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +71,7 @@ public class ConfigurationActivity extends ActionBarActivity implements
 		btnCancel = (Button) findViewById(R.id.btnCancel);
 		lvconfig.setItemsCanFocus(true);
 		lvconfig.setOnItemClickListener(this);
+		lvconfig.setTextFilterEnabled(true);
 		btnOK.setOnClickListener(this);
 		btnCancel.setOnClickListener(this);
 	}
@@ -68,31 +82,30 @@ public class ConfigurationActivity extends ActionBarActivity implements
 		new WSGetDataDo(this).execute();
 	}
 
-	//when click on the listview
+	// when click on the listview
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
+		Toast.makeText(getApplicationContext(), String.valueOf(position),
+				Toast.LENGTH_LONG);
+		Log.e("dfd", String.valueOf(position));
 		Symbol sb = (Symbol) parent.getItemAtPosition(position);
 		if (sb.isSelected())
 			sb.setSelected(false);
 		else {
 			sb.setSelected(true);
-		}
-		listsymbol.set(position, sb);
+		}		
+		int vt = sb.getPosinlist();
+		listsymbol.set(vt, sb);
 		adapter.notifyDataSetChanged();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
-		return super.onCreateOptionsMenu(menu);
 	}
 
 	// update data in listview to database
 	private void Updatedatabase() {
 		String json = Converttojson().toString();
 		HttpClient httpclient = new DefaultHttpClient();
-		String URL = ConfigurationServer.getURLServer() + "wsUpdateStockInterest.php";
+		String URL = ConfigurationServer.getURLServer()
+				+ "wsUpdateStockInterest.php";
 		try {
 			HttpPost httppost = new HttpPost(URL);
 
@@ -118,7 +131,7 @@ public class ConfigurationActivity extends ActionBarActivity implements
 		}
 	}
 
-	//get data json to listview
+	// get data json to listview
 	private JSONObject Converttojson() {
 		JSONObject object = new JSONObject();
 		int flag;
@@ -154,6 +167,7 @@ public class ConfigurationActivity extends ActionBarActivity implements
 		@Override
 		protected Void doInBackground(Void... params) {
 			listsymbol = new ArrayList<Symbol>();
+			listcode = new ArrayList<String>();
 			if (listsymbol.size() > 0)
 				listsymbol.clear();
 			try {
@@ -172,6 +186,7 @@ public class ConfigurationActivity extends ActionBarActivity implements
 					flag = false;
 					if (Integer.parseInt(element.getString("checked")) == 1)
 						flag = true;
+					symbol.setPosinlist(i);
 					symbol.setSelected(flag);
 					listsymbol.add(symbol);
 				}
@@ -208,7 +223,32 @@ public class ConfigurationActivity extends ActionBarActivity implements
 		default:
 			break;
 		}
-		
+
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.search_view, menu);
+		MenuItem itemSearch = menu.findItem(R.id.action_search);
+		mSearchView = (SearchView) itemSearch.getActionView();
+		mSearchView.setOnQueryTextListener(this);
+		return true;
+	}
+
+	@Override
+	public boolean onQueryTextSubmit(String query) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean onQueryTextChange(String newText) {
+		if (TextUtils.isEmpty(newText)) {
+			adapter.getFilter().filter("");
+			lvconfig.clearTextFilter();
+		} else {
+			lvconfig.setFilterText(newText.toUpperCase());
+		}
+		return true;
+	}
 }
