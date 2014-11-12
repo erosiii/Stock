@@ -19,12 +19,9 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.app.SearchManager;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -35,12 +32,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
-import android.widget.Toast;
-
 import com.iii.stockiii.adapter.ListSymbolAdapter;
 import com.iii.stockiii.config.ConfigurationServer;
 import com.iii.stockiii.config.ConfigurationWS;
@@ -55,7 +49,6 @@ public class ConfigurationActivity extends Activity implements
 	private List<Symbol> listsymbol;
 	private Button btnOK, btnCancel;
 	private SearchView mSearchView;
-	private List<String> listcode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -86,15 +79,12 @@ public class ConfigurationActivity extends Activity implements
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		Toast.makeText(getApplicationContext(), String.valueOf(position),
-				Toast.LENGTH_LONG);
-		Log.e("dfd", String.valueOf(position));
 		Symbol sb = (Symbol) parent.getItemAtPosition(position);
 		if (sb.isSelected())
 			sb.setSelected(false);
 		else {
 			sb.setSelected(true);
-		}		
+		}
 		int vt = sb.getPosinlist();
 		listsymbol.set(vt, sb);
 		adapter.notifyDataSetChanged();
@@ -167,7 +157,6 @@ public class ConfigurationActivity extends Activity implements
 		@Override
 		protected Void doInBackground(Void... params) {
 			listsymbol = new ArrayList<Symbol>();
-			listcode = new ArrayList<String>();
 			if (listsymbol.size() > 0)
 				listsymbol.clear();
 			try {

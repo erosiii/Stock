@@ -79,10 +79,9 @@ public class MainActivity extends Activity implements OnClickListener {
 				showDialogLogin();
 			}
 		} else {
-			// new WSCheckLogin(MainActivity.this,
-			// myShare.getUerPhone().toString().trim(),
-			// myShare.getUserEmail().toString().trim(),
-			// check, dl, myShare, showFrom).execute();
+			new WSCheckLogin(MainActivity.this, myShare.getUerPhone()
+					.toString().trim(), myShare.getUserEmail().toString()
+					.trim(), check, dl, myShare, showFrom).execute();
 		}
 		// VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, "giam",
 		// 3, "cham", "gia");
@@ -484,11 +483,10 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			public void onClick(View v) {
 				check = false;
-				// new WSCheckLogin(MainActivity.this,
-				// txtPhone.getText().toString().trim(),
-				// txtEmail.getText().toString().trim(), check, dl, myShare,
-				// showFrom).execute();
-				dl.dismiss();
+				new WSCheckLogin(MainActivity.this, txtPhone.getText()
+						.toString().trim(), txtEmail.getText().toString()
+						.trim(), check, dl, myShare, showFrom).execute();
+				// dl.dismiss();
 			}
 		});
 
