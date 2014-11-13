@@ -1,9 +1,7 @@
 package com.iii.stockiii.config;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -21,8 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.content.Context;
-import android.util.Log;
-import android.widget.ListView;
 
 public class HttpUrlConfigurationWS {
 

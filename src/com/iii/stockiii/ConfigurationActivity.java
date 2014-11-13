@@ -72,7 +72,7 @@ public class ConfigurationActivity extends Activity implements
 	private void SetData() {
 		mProgress = new ProgressDialog(ConfigurationActivity.this);
 		mProgress.show();
-		new WSGetDataDo(this).execute();
+		new WSGetDataSymbol(this).execute();
 	}
 
 	// when click on the listview
@@ -132,7 +132,7 @@ public class ConfigurationActivity extends Activity implements
 					flag = 1;
 				object.put(listsymbol.get(i).getCode().toString(),
 						String.valueOf(flag));
-
+				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -142,13 +142,13 @@ public class ConfigurationActivity extends Activity implements
 		return object;
 	}
 
-	public class WSGetDataDo extends AsyncTask<Void, Void, Void> {
+	public class WSGetDataSymbol extends AsyncTask<Void, Void, Void> {
 		// ------------------default floor1-----------------------------//
 		private ConfigurationWS mWs;
 
 		private Context context;
 
-		public WSGetDataDo(Context mContext) {
+		public WSGetDataSymbol(Context mContext) {
 			super();
 			context = mContext;
 			mWs = new ConfigurationWS(mContext);
@@ -162,7 +162,7 @@ public class ConfigurationActivity extends Activity implements
 			try {
 				// ---------------get String ------------------------//
 				String UrlGetDataDo = ConfigurationServer.getURLServer()
-						+ "wsgetsymbol.php";
+						+ "wsgetInterest.php";
 				JSONObject json = new JSONObject();
 				boolean flag;
 				JSONArray jarr = mWs.connectWSPut_Get_Data(UrlGetDataDo, json,

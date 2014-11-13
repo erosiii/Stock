@@ -1,19 +1,13 @@
 package com.iii.stockiii.config;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
-
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.json.JSONException;
 import org.json.JSONObject;

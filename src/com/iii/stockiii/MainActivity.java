@@ -1,16 +1,27 @@
 package com.iii.stockiii;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,10 +34,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -34,11 +43,9 @@ import android.widget.Toast;
 import com.iii.stockiii.adapter.ListStockAdapter;
 import com.iii.stockiii.config.ConfigurationServer;
 import com.iii.stockiii.config.ConfigurationWS;
-import com.iii.stockiii.helper.MyShareprefer;
 import com.iii.stockiii.helper.VoiceMangamentHelp;
 import com.iii.stockiii.model.Stock;
 import com.iii.stockiii.model.Voices;
-import com.iii.stockiii.ws.WSCheckLogin;
 
 public class MainActivity extends Activity implements OnClickListener {
 	private ListView lsvStock;
@@ -50,20 +57,17 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ArrayList<Voices> lstVoices;
 	private ListStockAdapter adapter;
 	private Handler handler;
-	int index;
-	int top;
+	private int index;
+	private int top;
 	private MediaPlayer media;
 	private long time;
 	private String left_value;
 	private String right_value;
 	private String left_price;
 	private String right_price;
-	private DecimalFormat df1 = new DecimalFormat("##.#");
 	private Thread thread, thread2;
-	private MyShareprefer myShare;
+	private SharedPreferences isshare;
 	private Dialog dl;
-	private boolean check;
-	private int showFrom = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,20 +76,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		policy();
 		setUI();
 		setData();
-		if (TextUtils.isEmpty(myShare.getUerPhone().toString().trim())
-				&& TextUtils.isEmpty(myShare.getUserName().toString().trim())) {
-			showFrom = 0;
-			if (showFrom == 0) {
-				showDialogLogin();
-			}
-		} else {
-			new WSCheckLogin(MainActivity.this, myShare.getUerPhone()
-					.toString().trim(), myShare.getUserEmail().toString()
-					.trim(), check, dl, myShare, showFrom).execute();
-		}
-		// VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, "giam",
-		// 3, "cham", "gia");
-
+		isshare = getSharedPreferences("saveinfo", this.MODE_PRIVATE);
+		if (TextUtils.isEmpty(isshare.getString("username", null))
+				&& TextUtils.isEmpty(isshare.getString("phone", null))
+				&& TextUtils.isEmpty(isshare.getString("email", null)))
+			showDialogLogin();
 	}
 
 	private void setUI() {
@@ -97,8 +92,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		lstStock = new ArrayList<Stock>();
 		lstVoices = new ArrayList<Voices>();
 		handler = new Handler();
-		myShare = new MyShareprefer(getApplicationContext(),
-				MyShareprefer.GET_INFOUSER_ITEM);
 
 		btnStartService.setOnClickListener(this);
 		btnStopService.setOnClickListener(this);
@@ -110,15 +103,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		index = lsvStock.getFirstVisiblePosition();
 		View v = lsvStock.getChildAt(0);
 		top = (v == null) ? 0 : v.getTop();
-		lsvStock.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				// TODO Auto-generated method stub
-
-			}
-		});
 		new WSGetDataDo(MainActivity.this).execute();
 
 		final Runnable r = new Runnable() {
@@ -242,6 +226,14 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		}
 
+		public void setAdapter() {
+			adapter = new ListStockAdapter(MainActivity.this,
+					R.layout.item_do_layout, lstStock);
+			lsvStock.setAdapter(adapter);
+			adapter.notifyDataSetChanged();
+			lsvStock.setSelectionFromTop(index, top);
+		}
+
 	}
 
 	public class WSGetStockConfig extends
@@ -307,7 +299,6 @@ public class MainActivity extends Activity implements OnClickListener {
 					} catch (Exception e) {
 						// TODO: handle exception
 					}
-
 					String[] split_price = strprice.split("\\.");
 					left_price = split_price[0];
 					right_price = split_price[1];
@@ -401,14 +392,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	public void setAdapter() {
-		adapter = new ListStockAdapter(MainActivity.this,
-				R.layout.item_do_layout, lstStock);
-		lsvStock.setAdapter(adapter);
-		adapter.notifyDataSetChanged();
-		lsvStock.setSelectionFromTop(index, top);
-	}
-
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
@@ -450,6 +433,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void showDialogLogin() {
 		// khởi tạo dialog
 		dl = new Dialog(this);
+		dl.setCanceledOnTouchOutside(false);
 		// set loại giao diện hay còn gọi là theme: cái này là ko có title
 		// dl.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dl.setTitle("Viet Stock Tracking");
@@ -468,25 +452,26 @@ public class MainActivity extends Activity implements OnClickListener {
 		txtEmail = (EditText) dl.findViewById(R.id.txtEmail);
 		cbRemember = (CheckBox) dl.findViewById(R.id.cbSaveUser);
 
-		final String phone = myShare.getUerPhone();
-		final String email = myShare.getUserEmail();
-		final String name = myShare.getUserName();
-
-		if (!TextUtils.isEmpty(phone) && !TextUtils.isEmpty(email)) {
-			txtName.setText(name);
-			txtPhone.setText(phone);
-			txtEmail.setText(email);
-			cbRemember.setChecked(true);
-		}
-
 		btnOk.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				check = false;
-				new WSCheckLogin(MainActivity.this, txtPhone.getText()
-						.toString().trim(), txtEmail.getText().toString()
-						.trim(), check, dl, myShare, showFrom).execute();
-				// dl.dismiss();
+
+				if (CheckLogin(txtName.getText().toString(), txtPhone.getText()
+						.toString(), txtEmail.getText().toString())) {
+
+					if (cbRemember.isChecked()) {
+						isshare = getSharedPreferences("saveinfo",
+								MainActivity.this.MODE_PRIVATE);
+						Editor editor = isshare.edit();
+						editor.putString("username", txtName.getText()
+								.toString());
+						editor.putString("phone", txtPhone.getText().toString());
+						editor.putString("email", txtEmail.getText().toString());
+						editor.commit();
+					}
+					dl.dismiss();
+				}
+
 			}
 		});
 
@@ -500,21 +485,63 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		});
 
-		/** Xử lý sự kiện click vào checkbox lưu lại thông tin user đăng nhập */
-		cbRemember.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-				if (isChecked) {
-					myShare.setUserEmail(txtEmail.getText().toString().trim());
-					myShare.setUserName(txtName.getText().toString().trim());
-					myShare.setUserPhone(txtPhone.getText().toString().trim());
-				} else {
-					myShare.logout();
-				}
+		dl.show();
+	}
+
+	private boolean CheckLogin(String name, String phone, String email) {
+		try {
+
+			DefaultHttpClient httpclient = new DefaultHttpClient();
+			HttpPost httppost = new HttpPost(ConfigurationServer.getURLServer()
+					+ "wsGetUser.php");
+
+			// add your data
+			ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+			nameValuePairs.add(new BasicNameValuePair("username", name.trim()));
+			nameValuePairs.add(new BasicNameValuePair("phone", phone.trim()));
+			nameValuePairs.add(new BasicNameValuePair("email", email.trim()));
+			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+			// Execute HTTP Post Request
+			HttpResponse response = httpclient.execute(httppost);
+
+			ResponseHandler<String> responseHandler = new BasicResponseHandler();
+			final String stringresponse = httpclient.execute(httppost,
+					responseHandler);
+			System.out.println("Response : " + response);
+
+			if (stringresponse.equalsIgnoreCase("1")) {
+				return true;
+			} else {
+				showAlert();
+			}
+
+		} catch (Exception e) {
+			dl.dismiss();
+			System.out.println("Exception : " + e.getMessage());
+		}
+		return false;
+	}
+
+	private void showAlert() {
+		MainActivity.this.runOnUiThread(new Runnable() {
+			public void run() {
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						MainActivity.this);
+				builder.setTitle("Login Error.");
+				builder.setMessage("User not Found.")
+						.setCancelable(false)
+						.setPositiveButton("OK",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+									}
+								});
+				AlertDialog alert = builder.create();
+				alert.show();
 			}
 		});
-		dl.show();
 	}
 
 }
