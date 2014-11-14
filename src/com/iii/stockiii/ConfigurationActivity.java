@@ -173,7 +173,7 @@ public class ConfigurationActivity extends Activity implements
 			try {
 				// ---------------get String ------------------------//
 				String UrlGetDataDo = ConfigurationServer.getURLServer()
-						+ "wsgetsymbol.php";
+						+ "wsgetInterest.php";
 				JSONObject json = new JSONObject();
 				boolean flag;
 				JSONArray jarr = mWs.connectWSPut_Get_Data(UrlGetDataDo, json,

@@ -1,7 +1,9 @@
 package com.iii.stockiii;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,6 +14,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.ParseException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,10 +26,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -60,12 +63,15 @@ public class MainActivity extends Activity implements OnClickListener{
 	 private String right_value;
 	 private String left_price;
 	 private String right_price;
+	 private String lsNow;
 	 private DecimalFormat df1 = new DecimalFormat("##.#");
 	 private Thread thread, thread2;
 	 private MyShareprefer myShare;
 	 private Dialog dl;
 	 private boolean check;
 	 private int showFrom =0;
+	 private SimpleDateFormat sdf;
+	 private Date date09, date11, date1330, date15, datenow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +109,11 @@ public class MainActivity extends Activity implements OnClickListener{
 		btnStopService.setOnClickListener(this);
 		btnConfiguration.setOnClickListener(this);
 		
+		Time now = new Time();
+		now.setToNow();
+		lsNow = now.format("%H:%M");
+		String pattern = "HH:mm";
+        sdf = new SimpleDateFormat(pattern);
 	}
 	
 	private void setData() {
@@ -139,7 +150,48 @@ public class MainActivity extends Activity implements OnClickListener{
 			@Override
 			public void run() {
 
-				new WSGetStockConfig(MainActivity.this).execute();				
+				new WSGetStockConfig(MainActivity.this).execute();		
+				try {
+					for (Voices voices : lstVoices) {
+						double difrrent_value = voices.getDifferent_value();
+						double price  = voices.getPrice();
+						String strdifrrent_value = String.valueOf(difrrent_value);
+						String strprice = String.valueOf(price);
+						String[] split_value = strdifrrent_value.split("\\.");
+						 left_value  = split_value[0];
+						 try {
+							 right_value  = split_value[1];
+						} catch (Exception e) {
+							// TODO: handle exception
+						}
+						 
+						
+						String[] split_price = strprice.split("\\.");
+						 left_price  = split_price[0];
+						 right_price  = split_price[1];
+						 try {
+		                     date09 = sdf.parse("09:00");
+		                     date11 = sdf.parse("11:00");
+		                     date1330 = sdf.parse("13:30");
+		                     date15 = sdf.parse("15:00");
+		                     datenow = sdf.parse(lsNow);
+		                     if(date09.before(datenow) && date11.after(datenow)){
+		                    	 setVoice(voices);
+		                     }else if(date1330.before(datenow) && date15.after(datenow)){
+		                    	 setVoice(voices);
+		                     }else{
+		                     	Log.d(">>>>CHECK TIME", "Khong nam trong khoang thoi gian");
+		                     }
+		          
+
+		                 }catch (java.text.ParseException e) {
+		         			// TODO Auto-generated catch block
+		         			e.printStackTrace();
+		         		}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			
 		};
@@ -149,7 +201,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		    public void run() {
 		        try {
 		            while(true) {
-		                sleep(2000);
+		                sleep(2500);
 		                handler.post(r);
 		            }
 		        } catch (InterruptedException e) {
@@ -307,60 +359,34 @@ public class MainActivity extends Activity implements OnClickListener{
 
 			@Override
 			protected void onPostExecute( ArrayList<Voices> result) {
-				try {
-					for (Voices voices : lstVoices) {
-						double difrrent_value = voices.getDifferent_value();
-						double price  = voices.getPrice();
-						String strdifrrent_value = String.valueOf(difrrent_value);
-						String strprice = String.valueOf(price);
-						String[] split_value = strdifrrent_value.split("\\.");
-						 left_value  = split_value[0];
-						 try {
-							 right_value  = split_value[1];
-						} catch (Exception e) {
-							// TODO: handle exception
-						}
-						 
-						
-						String[] split_price = strprice.split("\\.");
-						 left_price  = split_price[0];
-						 right_price  = split_price[1];
-						Time now = new Time();
-						now.setToNow();
-						String lsNow = now.format("%H:%M");
-						if(lsNow.equals("09:00")){
-							setVoice(voices);
-						}else if(lsNow.equals("11:30")){
-							setVoice(voices);
-						}else if(lsNow.equals("13:00")){
-							setVoice(voices);
-						}else if(lsNow.equals("17:07")){
-							setVoice(voices);
-						}else if(lsNow.equals("10:20")){
-							setVoice(voices);
-						}
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				
 			}
 	}
 	
 	private void setVoice(Voices voices){
 		if(voices.getInc_des() == 0){
 				if(lstSymbolChecked.contains(voices.getStrchange())){
-					VoiceMangamentHelp.callVibrate(MainActivity.this, time);
-					VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, voices.getStrchange(),"giam", Integer.parseInt(left_value),
-					 Integer.parseInt(right_value), Integer.parseInt(left_price), Integer.parseInt(right_price),
-					"cham", "gia");
+					try {
+						VoiceMangamentHelp.callVibrate(MainActivity.this, time);
+						VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, voices.getStrchange(),"giam", Integer.parseInt(left_value),
+						 Integer.parseInt(right_value), Integer.parseInt(left_price), Integer.parseInt(right_price),
+						"cham", "gia");
+					} catch (Exception e) {
+						// TODO: handle exception
+					}
+					
 					new WSUpdateFlag(MainActivity.this, voices.getStrchange()).execute();
 				}
 		}else{
 				if(lstSymbolChecked.contains(voices.getStrchange())){
-					VoiceMangamentHelp.callVibrate(MainActivity.this, time);
-					VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, voices.getStrchange(), "tang", Integer.parseInt(left_value),
-					 Integer.parseInt(right_value), Integer.parseInt(left_price), Integer.parseInt(right_price),
-					"cham", "gia");
+					try {
+						VoiceMangamentHelp.callVibrate(MainActivity.this, time);
+						VoiceMangamentHelp.makeVoice(MainActivity.this, media, time, voices.getStrchange(), "tang", Integer.parseInt(left_value),
+						 Integer.parseInt(right_value), Integer.parseInt(left_price), Integer.parseInt(right_price),
+						"cham", "gia");
+					} catch (Exception e) {
+						// TODO: handle exception
+					}
 					new WSUpdateFlag(MainActivity.this, voices.getStrchange()).execute();
 				}
 		}
